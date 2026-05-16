@@ -228,6 +228,68 @@ html, body {
 #speed-val  { font-size: 46px; font-weight: 200; color: #fff; line-height: 1; }
 #speed-unit { font-size: 11px; letter-spacing: 0.2em; color: var(--ui-muted); }
 
+/* ── Loading Screen ── */
+#loading-screen {
+  position: fixed; inset: 0;
+  background: #000;
+  z-index: 400;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 0;
+  transition: opacity 0.9s ease;
+}
+#loading-screen.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+#loading-title {
+  font-size: 12px;
+  letter-spacing: 0.5em;
+  color: rgba(255,255,255,0.75);
+  text-transform: uppercase;
+  margin-bottom: 32px;
+}
+#loading-bar-wrap {
+  width: 160px; height: 1px;
+  background: rgba(255,255,255,0.15);
+}
+#loading-bar {
+  height: 100%; width: 0%;
+  background: rgba(255,255,255,0.85);
+  transition: width 0.25s ease;
+}
+#loading-pct {
+  margin-top: 14px;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: rgba(255,255,255,0.3);
+}
+
+/* ── 모바일 UI 레이아웃 (좁은 화면 충돌 방지) ── */
+@media (max-width: 600px) {
+  /* time-toggle: 중앙 → 좌측, cam-toggle 아래로 이동 */
+  #time-toggle {
+    top: 62px;
+    left: 18px;
+    transform: none;
+  }
+  .time-btn { padding: 7px 16px; font-size: 11px; }
+
+  /* cam-toggle: 크기 약간 축소 */
+  .cam-btn  { padding: 7px 14px; font-size: 11px; }
+
+  /* music-panel: 너비 축소 + 상단 여백 살짝 줄임 */
+  #music-panel {
+    min-width: 0;
+    width: 155px;
+    top: 14px;
+    right: 14px;
+    padding: 10px 11px;
+  }
+  #music-name { max-width: 100px; font-size: 11px; }
+  #yt-link-input { font-size: 9px; }
+}
+
 /* YouTube wrapper — off-screen, opacity:0 (NOT visibility:hidden which blocks iframe init) */
 #yt-wrap {
   position: fixed;

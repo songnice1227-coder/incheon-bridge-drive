@@ -342,6 +342,17 @@ driveScene.background = p.sky ? null : new THREE.Color(0x00010a);
     cityWindowPoints.material.opacity = isNight ? 0.88 : 0.40;
     cityWindowPoints.visible = true;
   }
+
+  // ── 모바일 아침 경량화 ──
+  if (isMobile) {
+    // 아침: bloom 끄기 + 그림자 끄기 → 가장 큰 GPU 비용 2개 제거
+    bloom.strength    = isNight ? 0.55 : 0;
+    sunLight.castShadow = isNight ? false : false; // 아침·저녁 모두 모바일 그림자 끔
+    // NPC 차량: 아침에는 8대만 (저녁은 16대 유지)
+    npcCars.forEach((car, i) => { car.mesh.visible = isNight ? true : i < 8; });
+  } else {
+    bloom.strength = isNight ? 0.55 : 0.15;
+  }
 }
 
 // ─────────────────────────────────────────────
@@ -758,7 +769,7 @@ function updateNightLights() {
 function loadCar() {
   const loader = new GLTFLoader();
 
-  const load = (targetGroup, onMixer, onWheels, callback) => {
+  const load = (targetGroup, onMixer, onWheels, callback, onProgress) => {
     loader.load('./assets/car.glb',
       gltf => {
         console.log('[Car] GLB 로딩 성공 ✅');
@@ -819,7 +830,7 @@ function loadCar() {
         }
         callback?.();
       },
-      undefined,
+      onProgress,
       err => {
         console.warn('[Car] GLB 로딩 실패 (폴백 사용):', err);
         fallbackCar(targetGroup, onWheels, callback);
@@ -827,9 +838,31 @@ function loadCar() {
     );
   };
 
-  load(garageCarGroup, mx => { garageMixer = mx; }, () => {}, () => applyColor(selectedColor));
+  // 첫 번째 로드에서 진행률 표시
+  const trackProgress = xhr => {
+    if (!xhr.total) return;
+    const pct = Math.min(100, Math.round(xhr.loaded / xhr.total * 100));
+    const bar = document.getElementById('loading-bar');
+    const txt = document.getElementById('loading-pct');
+    if (bar) bar.style.width = pct + '%';
+    if (txt) txt.textContent = pct + '%';
+  };
+
+  load(garageCarGroup, mx => { garageMixer = mx; }, () => {}, () => applyColor(selectedColor), trackProgress);
   load(driveCarGroup,  mx => { driveMixer  = mx; }, n  => driveWheels.push(n),
     () => {
+      // 드라이브 차량 로드 완료 → 로딩 화면 페이드 아웃
+      const screen = document.getElementById('loading-screen');
+      if (screen) {
+        const bar = document.getElementById('loading-bar');
+        const txt = document.getElementById('loading-pct');
+        if (bar) bar.style.width = '100%';
+        if (txt) txt.textContent = '100%';
+        setTimeout(() => {
+          screen.classList.add('fade-out');
+          setTimeout(() => screen.remove(), 950);
+        }, 300);
+      }
       document.getElementById('touch-hint') && (document.getElementById('touch-hint').style.opacity = '0');
       applyColor(selectedColor);
     }
