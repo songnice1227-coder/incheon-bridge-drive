@@ -211,17 +211,32 @@ function buildDriveScene() {
   sky.scale.setScalar(500000);
   driveScene.add(sky);
 
-  // Water
-  water = new Water(new THREE.PlaneGeometry(200000, 200000, 8, 8), {
-    textureWidth: 512, textureHeight: 512,
-    waterNormals: new THREE.TextureLoader().load(
-      'https://threejs.org/examples/textures/waternormals.jpg',
-      t => { t.wrapS = t.wrapT = THREE.RepeatWrapping; }
-    ),
-    sunDirection: new THREE.Vector3(),
-    sunColor: 0xffffff, waterColor: 0x001e3f,
-    distortionScale: 3.5, fog: false,
-  });
+  // Water — 모바일: 단순 평면(반사 RTT 없음), 데스크톱: 풀 셰이더
+  if (isMobile) {
+    water = new THREE.Mesh(
+      new THREE.PlaneGeometry(200000, 200000),
+      new THREE.MeshBasicMaterial({ color: 0x005f8a })
+    );
+    water.rotation.x = -Math.PI / 2;
+    // applyTimeOfDay가 water.material.uniforms를 참조하므로 더미 uniforms 추가
+    water.material.uniforms = {
+      sunDirection: { value: new THREE.Vector3() },
+      waterColor:   { value: new THREE.Color(0x005f8a) },
+      distortionScale: { value: 0 },
+      time: { value: 0 },
+    };
+  } else {
+    water = new Water(new THREE.PlaneGeometry(200000, 200000, 8, 8), {
+      textureWidth: 512, textureHeight: 512,
+      waterNormals: new THREE.TextureLoader().load(
+        'https://threejs.org/examples/textures/waternormals.jpg',
+        t => { t.wrapS = t.wrapT = THREE.RepeatWrapping; }
+      ),
+      sunDirection: new THREE.Vector3(),
+      sunColor: 0xffffff, waterColor: 0x001e3f,
+      distortionScale: 3.5, fog: false,
+    });
+  }
   water.rotation.x = -Math.PI / 2;
   driveScene.add(water);
 
@@ -312,9 +327,13 @@ function applyTimeOfDay(time) {
   ambLight.intensity  = p.ambInt;
   renderer.toneMappingExposure = p.exposure;
 
-  water.material.uniforms['sunDirection'].value.copy(sunPos).normalize();
-  water.material.uniforms['waterColor'].value.set(p.waterColor);
-  water.material.uniforms['distortionScale'].value = p.dist;
+  if (isMobile) {
+    water.material.color?.set(p.waterColor);
+  } else {
+    water.material.uniforms['sunDirection'].value.copy(sunPos).normalize();
+    water.material.uniforms['waterColor'].value.set(p.waterColor);
+    water.material.uniforms['distortionScale'].value = p.dist;
+  }
 
   driveScene.fog.color.set(p.fogColor);
   driveScene.fog.density = p.fogDensity;
@@ -1308,7 +1327,7 @@ function animate() {
   if (appState === 'garage') {
     updateGarage(dt);
   } else {
-    if (water) water.material.uniforms['time'].value += dt * 0.4;
+    if (water && !isMobile) water.material.uniforms['time'].value += dt * 0.4;
     updatePhysics(dt);
     updateNPCs(dt);
     updateNightLights();
