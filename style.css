@@ -1,0 +1,239 @@
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --ui-bg:    rgba(8, 8, 8, 0.55);
+  --ui-brd:   rgba(255,255,255,0.12);
+  --ui-text:  rgba(255,255,255,0.92);
+  --ui-muted: rgba(255,255,255,0.42);
+  --font: 'Helvetica Neue', Arial, sans-serif;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  background: #000;
+  overflow: hidden;
+  font-family: var(--font);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  touch-action: none;
+}
+
+#canvas {
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%;
+  display: block;
+}
+
+/* ── Overlay: CSS animation so it fades even if JS errors ── */
+#overlay {
+  position: fixed; inset: 0;
+  background: #000;
+  pointer-events: none;
+  z-index: 200;
+  animation: overlayFade 1.4s ease 0.5s forwards;
+}
+@keyframes overlayFade {
+  to { opacity: 0; }
+}
+
+/* ══ GARAGE UI ══ */
+#garage-ui {
+  position: fixed; inset: 0;
+  display: flex; align-items: flex-end; justify-content: center;
+  padding-bottom: 52px;
+  z-index: 50;
+  background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 45%);
+  pointer-events: none;
+}
+.garage-inner {
+  display: flex; flex-direction: column; align-items: center; gap: 20px;
+  pointer-events: all;
+}
+.garage-label {
+  font-size: 11px; letter-spacing: 0.38em;
+  color: var(--ui-muted); text-transform: uppercase;
+}
+#swatches { display: flex; gap: 16px; }
+.swatch {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: var(--c);
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: transform 0.18s, box-shadow 0.18s;
+}
+.swatch:hover  { transform: scale(1.18); }
+.swatch.active { box-shadow: 0 0 0 3px rgba(255,255,255,0.22), 0 0 0 5px var(--c); }
+
+#start-btn {
+  margin-top: 6px;
+  padding: 14px 46px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.28);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 14px; letter-spacing: 0.2em; text-transform: uppercase;
+  cursor: pointer;
+  backdrop-filter: blur(14px);
+  transition: background 0.2s, border-color 0.2s;
+}
+#start-btn:hover {
+  background: rgba(255,255,255,0.16);
+  border-color: rgba(255,255,255,0.5);
+}
+
+/* ══ DRIVE UI ══ */
+#drive-ui {
+  display: none;
+  position: fixed; inset: 0;
+  z-index: 50;
+  pointer-events: none;
+}
+#drive-ui.active { display: block; }
+
+/* Time toggle */
+#time-toggle {
+  position: absolute; top: 20px; left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  background: var(--ui-bg);
+  border: 1px solid var(--ui-brd);
+  border-radius: 30px; overflow: hidden;
+  backdrop-filter: blur(14px);
+  pointer-events: all;
+  z-index: 20;
+}
+.time-btn {
+  padding: 9px 24px;
+  background: transparent; border: none;
+  color: var(--ui-muted);
+  font-size: 12px; letter-spacing: 0.12em;
+  cursor: pointer;
+  transition: background 0.25s, color 0.25s;
+}
+.time-btn.active { background: rgba(255,255,255,0.14); color: var(--ui-text); }
+
+/* Camera toggle */
+#cam-toggle {
+  position: absolute; top: 20px; left: 18px;
+  display: flex;
+  background: var(--ui-bg);
+  border: 1px solid var(--ui-brd);
+  border-radius: 30px; overflow: hidden;
+  backdrop-filter: blur(14px);
+  pointer-events: all;
+  z-index: 20;
+}
+.cam-btn {
+  padding: 9px 18px;
+  background: transparent; border: none;
+  color: var(--ui-muted);
+  font-size: 12px; letter-spacing: 0.12em;
+  cursor: pointer;
+  transition: background 0.25s, color 0.25s;
+}
+.cam-btn.active { background: rgba(255,255,255,0.14); color: var(--ui-text); }
+
+/* Music panel */
+#music-panel {
+  position: absolute; top: 18px; right: 18px;
+  display: flex; flex-direction: column; gap: 7px;
+  background: var(--ui-bg);
+  border: 1px solid var(--ui-brd);
+  border-radius: 14px;
+  padding: 12px 14px;
+  backdrop-filter: blur(14px);
+  min-width: 195px;
+  pointer-events: all;
+  z-index: 20;
+}
+#music-row { display: flex; align-items: center; gap: 10px; }
+#music-info { flex: 1; overflow: hidden; }
+#music-name {
+  color: var(--ui-text); font-size: 12px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 140px;
+}
+#music-src { color: var(--ui-muted); font-size: 10px; margin-top: 2px; }
+#music-play-btn {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: #fff; font-size: 11px;
+  cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+#music-upload-lbl {
+  font-size: 11px; color: var(--ui-muted);
+  border-top: 1px solid var(--ui-brd);
+  padding-top: 7px; cursor: pointer;
+  text-align: center; transition: color 0.2s;
+}
+#music-upload-lbl:hover { color: var(--ui-text); }
+#music-file { display: none; }
+#music-yt-row {
+  display: flex; gap: 6px;
+  border-top: 1px solid var(--ui-brd);
+  padding-top: 7px;
+}
+#yt-link-input {
+  flex: 1; background: rgba(255,255,255,0.07);
+  border: 1px solid var(--ui-brd); border-radius: 5px;
+  color: var(--ui-text); font-size: 10px;
+  padding: 5px 7px; outline: none;
+}
+#yt-link-input::placeholder { color: var(--ui-muted); }
+#yt-link-btn {
+  padding: 5px 10px; border-radius: 5px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid var(--ui-brd);
+  color: var(--ui-text); font-size: 10px;
+  cursor: pointer; white-space: nowrap;
+}
+#yt-link-btn:hover { background: rgba(255,255,255,0.2); }
+#yt-status {
+  font-size: 10px; color: var(--ui-muted);
+  text-align: center; min-height: 13px;
+}
+
+/* Full-screen drive touch area */
+#drive-touch {
+  position: absolute; inset: 0;
+  pointer-events: all;
+  z-index: 5;
+}
+
+/* Touch hint */
+#touch-hint {
+  position: absolute;
+  bottom: 44px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 13px; letter-spacing: 0.22em;
+  color: rgba(255,255,255,0.35);
+  pointer-events: none;
+  z-index: 6;
+  transition: opacity 0.6s;
+}
+#touch-hint.hidden { opacity: 0; }
+
+/* Speedometer */
+#speed-box {
+  position: absolute;
+  bottom: 36px; right: 26px;
+  text-align: right;
+  pointer-events: none;
+  z-index: 6;
+}
+#speed-val  { font-size: 46px; font-weight: 200; color: #fff; line-height: 1; }
+#speed-unit { font-size: 11px; letter-spacing: 0.2em; color: var(--ui-muted); }
+
+/* YouTube wrapper — off-screen, opacity:0 (NOT visibility:hidden which blocks iframe init) */
+#yt-wrap {
+  position: fixed;
+  bottom: -400px; right: -400px;
+  width: 200px; height: 120px;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0;
+}

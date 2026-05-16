@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>인천대교 드라이브</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <canvas id="canvas"></canvas>
+  <div id="overlay"></div>
+
+  <!-- ── GARAGE UI ── -->
+  <div id="garage-ui">
+    <div class="garage-inner">
+      <p class="garage-label">PAINT</p>
+      <div id="swatches">
+        <button class="swatch active" data-color="red"    style="--c:#CC2828" title="레드"></button>
+        <button class="swatch"        data-color="yellow" style="--c:#F0C000" title="옐로우"></button>
+        <button class="swatch"        data-color="black"  style="--c:#181818" title="블랙"></button>
+        <button class="swatch"        data-color="mint"   style="--c:#3DBCB4" title="민트 블루"></button>
+        <button class="swatch"        data-color="gray"   style="--c:#909090" title="그레이"></button>
+      </div>
+      <button id="start-btn">GO</button>
+    </div>
+  </div>
+
+  <!-- ── DRIVE UI ── -->
+  <div id="drive-ui">
+
+    <!-- Time toggle -->
+    <div id="time-toggle">
+      <button class="time-btn active" data-time="morning">☀ 아침</button>
+      <button class="time-btn"        data-time="night">🌃 저녁</button>
+    </div>
+
+    <!-- Camera view toggle -->
+    <div id="cam-toggle">
+      <button class="cam-btn active" data-cam="rear">후방</button>
+      <button class="cam-btn"        data-cam="front">전방</button>
+    </div>
+
+    <!-- Music player -->
+    <div id="music-panel">
+      <div id="music-row">
+        <div id="music-info">
+          <div id="music-name">Glide — NEIKED</div>
+          <div id="music-src">YouTube</div>
+        </div>
+        <button id="music-play-btn">▶</button>
+      </div>
+      <label id="music-upload-lbl">+ 내 음악<input type="file" id="music-file" accept="audio/*"></label>
+      <div id="music-yt-row">
+        <input id="yt-link-input" type="text" placeholder="YouTube 링크 붙여넣기">
+        <button id="yt-link-btn">재생</button>
+      </div>
+      <div id="yt-status"></div>
+    </div>
+
+    <!-- Full-screen drive area (tap = forward, drag = steer) -->
+    <div id="drive-touch"></div>
+
+    <!-- Touch hint -->
+    <div id="touch-hint">터치하여 출발</div>
+
+    <!-- Speed -->
+    <div id="speed-box">
+      <div id="speed-val">0</div>
+      <div id="speed-unit">km/h</div>
+    </div>
+
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three":         "https://cdn.jsdelivr.net/npm/three@0.168.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.168.0/examples/jsm/"
+    }
+  }
+  </script>
+  <!-- YouTube hidden player (for optional YouTube link playback) -->
+  <div id="yt-wrap"><div id="yt-player"></div></div>
+
+  <script type="module" src="src/main.js"></script>
+  <script src="https://www.youtube.com/iframe_api"></script>
+</body>
+</html>
